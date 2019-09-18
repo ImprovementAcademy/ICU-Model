@@ -1,3 +1,8 @@
+## ICU Model v1.0
+## (c) Tom Lawton, 2019
+## Distributed under the GNU General Public License
+
+
 library("dplyr")
 library("parallel")
 library("simmer")
