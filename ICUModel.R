@@ -32,7 +32,7 @@ daterange<-difftime(max(patients$Admission.Date),min(patients$Admission.Date),un
 ## All needs wrapping so that we can run multiple replications (Monte Carlo)
 
 simmer_wrapper <- function(i) {
-
+  
   sim_start_date<-as.Date("2020-01-01")
   sim_end_date<-as.Date("2021-07-01")
   
@@ -52,8 +52,8 @@ simmer_wrapper <- function(i) {
       if (patient$Level.3.days>0) lvl_start<-3
       return(c(lvl_start,patient$Level.3.days,patient$Level.2.days,patient$Level.1.days,patient$Level.0.days))
     })
-    
-
+  
+  
   ## Common patient trajectory, where all the timeouts actually occur
   ## Initially there's an offset to account for the way ICNARC dates are calculated (eg stay 8pm-8am, counts as 2)
   ## Offset subtraction means that patients will "leave" on the morning of their last day to let the bed be re-used
@@ -63,9 +63,9 @@ simmer_wrapper <- function(i) {
       offset<-now(env)-floor(now(env))+0.9
       ldays<-c(get_attribute(env,"l0days"),get_attribute(env,"l1days"),get_attribute(env,"l2days"),get_attribute(env,"l3days"))
       for (i in 1:length(ldays)) {
-          red<-min(ldays[i],offset)
-          ldays[i]<-ldays[i]-red
-          offset<-offset-red
+        red<-min(ldays[i],offset)
+        ldays[i]<-ldays[i]-red
+        offset<-offset-red
       }
       return(ldays)
     }) %>%
@@ -77,17 +77,17 @@ simmer_wrapper <- function(i) {
     timeout(function() {get_attribute(env,"l0days")}) %>% 
     release_all("halfnurse") %>% 
     release_all("bed")
-    
   
-## Initial trajectory for emergency patients
+  
+  ## Initial trajectory for emergency patients
   ## Appear at timepoint 0.0 so they get priority
   ## If no space, they disappear and count as an emergency transfer out
-
+  
   emergency_transferout<-trajectory() %>% 
     set_global("Emergency Transfer Out",1,mod="+")
   
   emergency_patient<-trajectory() %>% 
-   # log_("Emergency Patient") %>% 
+    # log_("Emergency Patient") %>% 
     set_attribute("type",1) %>% 
     join(choose_real_patient) %>% 
     renege_in(0.7,emergency_transferout) %>% 
@@ -102,12 +102,12 @@ simmer_wrapper <- function(i) {
   ## Initial trajectory for elective patients
   ## Appear at timepoint 0.1 so they have less priority
   ## If no space, they reappear a week later
-
+  
   elective_delay<-trajectory() %>% 
     set_global("Cancelled Elective Surgery",1,mod="+") %>% 
     timeout(6.5) %>% # 7 days minus the 0.5 before renege
     rollback(3) # to renege_in in elective_patient
-
+  
   elective_patient<-trajectory() %>% 
     #log_("Elective Patient") %>% 
     set_attribute("type",2) %>% 
@@ -121,14 +121,14 @@ simmer_wrapper <- function(i) {
     renege_abort() %>% 
     join(common_patient)
   
-
+  
   ## Initial trajectory for repatriation patients
   ## Appear at timepoint 0.2 so they have less priority
   ## If no space, they reappear a day later
   
-    repatriation_rejected<-trajectory() %>% 
+  repatriation_rejected<-trajectory() %>% 
     set_global("Repatriation Rejected",1,mod="+") %>% 
-    timeout(0.7) %>% # try again tomorrow = 1 day minus 0.5 before renege
+    timeout(0.7) %>% # try again tomorrow = 1 day minus 0.3 before renege
     rollback(3) # to renege_in in repatriation_patient
   
   repatriation_patient<-trajectory() %>% 
@@ -148,10 +148,10 @@ simmer_wrapper <- function(i) {
   ## Initial trajectory for transferred-in patients
   ## Appear at timepoint 0.3 so they have lowest priority
   ## If no space, they are rejected and disappear
- 
+  
   transferin_rejected<-trajectory() %>% 
     set_global("Transfer In Rejected",1,mod="+")
-   
+  
   transferin_patient<-trajectory() %>% 
     #log_("Transfer In Patient") %>% 
     set_attribute("type",4) %>% 
@@ -165,7 +165,7 @@ simmer_wrapper <- function(i) {
     renege_abort() %>% 
     join(common_patient)
   
-
+  
   ## Function to generate time-gaps between patients
   ## Uses closures so it can be replicated across different patient types, and to persist variables across calls
   ## Produces patients from sim_start_date to sim_end_date before returning -1 to signal the end
@@ -212,7 +212,7 @@ simmer_wrapper <- function(i) {
     add_resource("bed",16) %>% 
     add_resource("halfnurse",24) %>% 
     run() %>% 
-  wrap()
+    wrap()
   
   
   
@@ -238,7 +238,6 @@ print(ggplot(max_attribs,aes(x=key,y=value,fill=key)) + geom_boxplot() + stat_su
 
 ## What is our distribution of bed use like?
 ## nb - system includes queue, server doesn't
-
 resources<-get_mon_resources(envs)
 resources2<-dplyr::filter(resources,resource=="bed")
 resources2$date<-as.Date(resources2$time,origin="1970-01-01")
