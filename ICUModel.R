@@ -214,13 +214,10 @@ simmer_wrapper <- function(i) {
     run() %>% 
     wrap()
   
-  
-  
 }
 
 ## Run the simulation repeatedly (Monte-Carlo method)
 envs<-mclapply(1:24,simmer_wrapper)
-
 
 ## Some example charts:
 
@@ -233,7 +230,10 @@ print(plot(get_mon_resources(envs[1]),steps=TRUE))
 ## Use max values as simmer records each time the value changes, we're only interested in the final value
 attribs<-get_mon_attributes(envs)
 max_attribs<-attribs %>% group_by(key,replication) %>% summarise(value=max(value))
-print(ggplot(max_attribs,aes(x=key,y=value,fill=key)) + geom_boxplot() + stat_summary(fun.y=mean, geom="point", shape=23,size=6)+ theme_bw(base_size=16) )
+print(ggplot(max_attribs,aes(x=key,y=value,fill=key)) +
+        geom_boxplot() +
+        stat_summary(fun.y=mean, geom="point", shape=23,size=6) +
+        theme_bw(base_size=16))
 
 
 ## What is our distribution of bed use like?
@@ -242,6 +242,11 @@ resources<-get_mon_resources(envs)
 resources2<-dplyr::filter(resources,resource=="bed")
 resources2$date<-as.Date(resources2$time,origin="1970-01-01")
 resources2$rwdate<-round_date(resources2$date,unit="week")
-print(ggplot(resources2,aes(x=date,y=system,color=replication)) + geom_point(alpha=0.1,shape=16) + scale_color_gradient(low="blue", high="red") + stat_summary(aes(x=rwdate,y=system),fun.data="mean_sdl",geom="smooth",se=TRUE)  +labs(x="Date",y="Beds") + theme_bw(base_size=16) )
+print(ggplot(resources2,aes(x=date,y=system,color=replication)) +
+        geom_point(alpha=0.1,shape=16) +
+        scale_color_gradient(low="blue", high="red") +
+        stat_summary(aes(x=rwdate,y=system),fun.data="mean_sdl",geom="smooth",se=TRUE) +
+        labs(x="Date",y="Beds") +
+        theme_bw(base_size=16))
 
 
