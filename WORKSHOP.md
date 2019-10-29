@@ -5,6 +5,8 @@ Written for the NHS-R Conference 2019
 
 Based on [http://futurehospital.rcpjournal.org/content/6/1/17.abstract]
 
+Produced as a teaching package to expand use of the technique being used in the Health Foundation's [Winter Pressures Modelling Project](https://www.health.org.uk/improvement-projects/use-of-novel-modelling-techniques-and-routinely-collected-data-to-explore-responses-to)
+
 ## Meta
 
 Tom Lawton – [@LawtonTri](https://twitter.com/lawtontri)
@@ -125,4 +127,8 @@ patients$Admission.Date<-as.Date(patients$Admission.Date,format="%d/%m/%Y")
 * Compare what would happen if "delayed discharges" were removed earlier (L1 and below)
 * Simulate an increase in elective/emergency workload
 
+## Acknowledgements
 
+![Health Foundation Logo](https://www.health.org.uk/themes/custom/health_foundation/assets/images/logo.png)
+
+The Winter Pressures Modelling Project is part of the Health Foundation’s Applied Analytics programme. The Health Foundation is an independent charity committed to bringing about better health and health care for people in the UK. 
