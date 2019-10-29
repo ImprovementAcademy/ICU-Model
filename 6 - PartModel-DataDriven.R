@@ -1,9 +1,11 @@
-## ICU Model v1.0 - Part 6 of teaching
+## ICU Model Precursor - Part 6
 ##
 ## Now uses real data to drive model
 ## Totals calculated to drive poisson statistic for generator
 ## Patient pulled from data to drive days at different levels for trajectories
 ## Uses mclapply so we can run Monte-Carlo
+##
+## TODO: for bonus points, add repatriations and transfers in
 ##
 ## (c) Tom Lawton, 2019
 ## Distributed under the GNU General Public License
@@ -128,50 +130,6 @@ simmer_wrapper <- function(i) {
     join(common_patient)
   
   
-  ## Initial trajectory for repatriation patients
-  ## Appear at timepoint 0.2 so they have less priority
-  ## If no space, they reappear a day later
-  
-  repatriation_rejected<-trajectory() %>% 
-    set_global("Repatriation Rejected",1,mod="+") %>% 
-    timeout(0.7) %>% # try again tomorrow = 1 day minus 0.3 before renege
-    rollback(3) # to renege_in in repatriation_patient
-  
-  repatriation_patient<-trajectory() %>% 
-    #log_("Repatriation Patient") %>% 
-    set_attribute("type",3) %>% 
-    join(choose_real_patient) %>% 
-    timeout(0.2) %>% 
-    renege_in(0.3,repatriation_rejected) %>% 
-    seize("bed") %>% 
-    seize("halfnurse", function() {
-      if (get_attribute(env,"lvl_start")==3) 2 else 1
-    }) %>% 
-    renege_abort() %>% 
-    join(common_patient)
-  
-  
-  ## Initial trajectory for transferred-in patients
-  ## Appear at timepoint 0.3 so they have lowest priority
-  ## If no space, they are rejected and disappear
-  
-  transferin_rejected<-trajectory() %>% 
-    set_global("Transfer In Rejected",1,mod="+")
-  
-  transferin_patient<-trajectory() %>% 
-    #log_("Transfer In Patient") %>% 
-    set_attribute("type",4) %>% 
-    join(choose_real_patient) %>% 
-    timeout(0.3) %>% 
-    renege_in(0.2,transferin_rejected) %>% 
-    seize("bed") %>% 
-    seize("halfnurse", function() {
-      if (get_attribute(env,"lvl_start")==3) 2 else 1
-    }) %>% 
-    renege_abort() %>% 
-    join(common_patient)
-  
-  
   ## Function to generate time-gaps between patients
   ## Uses closures so it can be replicated across different patient types, and to persist variables across calls
   ## Produces patients from sim_start_date to sim_end_date before returning -1 to signal the end
@@ -204,7 +162,7 @@ simmer_wrapper <- function(i) {
   }
   
   
-  ## Set up the simulation. 4 Admission types, 2 resources
+  ## Set up the simulation. 2 Admission types, 2 resources
   ## bed - represents a physical bed (we have 16)
   ## halfnurse - represents half of a nurse (we have 12 nurses)
   ## halfnurse used because level 2 and below patients can have a 1:2 nursing ratio
@@ -213,8 +171,6 @@ simmer_wrapper <- function(i) {
   env %>% 
     add_generator("Emergency Patient",emergency_patient,patient_gen("Unplanned local admission")) %>%         ## Type 1
     add_generator("Elective Patient",elective_patient,patient_gen("Planned local surgical admission")) %>%    ## Type 2
-    add_generator("Repatriation Patient",repatriation_patient,patient_gen("Repatriation")) %>%                ## Type 3
-    add_generator("Transfer In Patient",transferin_patient,patient_gen("Unplanned transfer in")) %>%          ## Type 4
     add_resource("bed",16) %>% 
     add_resource("halfnurse",24) %>% 
     run() %>% 
