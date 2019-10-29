@@ -1,9 +1,10 @@
-## ICU Model Precursor - Part 1
+## ICU Model Precursor - Part 2
 ##
 ## This version uses fixed Poisson-process arrival times
 ## Random (runif) decision on starting L3 or L2
 ## Random number of days spent on unit
 ##
+## TODO: Split trajectories for elective vs emergency patients
 ## TODO: Give patients different level-days (use attributes to store requirements). Suggest a common trajectory to generate a patient into the attributes
 ## TODO: Add generator for patient inter-arrival gaps
 ## TODO: Change to use real data from CSV
@@ -34,12 +35,20 @@ simmer_wrapper <- function(i) {
   
   env<-simmer("ICU")
   
+  ## Initial trajectory for patients
+  ## Appear at timepoint 0.0
+  ## If no space, they disappear and count as a transfer out/cancellation
   
+  transferout<-trajectory() %>% 
+    set_global("Transfer or Cancel",1,mod="+")
   
-  ## Common patient trajectory, where all the timeouts actually occur
-  ## runif 0-15 chosen empirically to give a vague balance to the unit
-  
-  common_patient<-trajectory() %>% 
+  patient<-trajectory() %>% 
+    renege_in(0.7,transferout) %>% 
+    seize("bed") %>% 
+    seize("halfnurse", function() {
+      if (runif(1)<0.5) 2 else 1 ## 50% chance of starting at level 3 or 2
+    }) %>% 
+    renege_abort() %>% 
     timeout(function() {round(runif(1,0,15))}) %>% ## may be L3 or L2 depending on start
     release("halfnurse",function(){ if (get_seized(env,"halfnurse")>1) 1 else 0 }) %>% 
     timeout(function() {round(runif(1,0,15))}) %>% ## definitely L2 or below now
@@ -47,55 +56,12 @@ simmer_wrapper <- function(i) {
     release_all("bed")
   
   
-  ## Initial trajectory for emergency patients
-  ## Appear at timepoint 0.0 so they get priority
-  ## If no space, they disappear and count as an emergency transfer out
-  
-  emergency_transferout<-trajectory() %>% 
-    set_global("Emergency Transfer Out",1,mod="+")
-  
-  emergency_patient<-trajectory() %>% 
-    # log_("Emergency Patient") %>% 
-    set_attribute("type",1) %>% 
-    renege_in(0.7,emergency_transferout) %>% 
-    seize("bed") %>% 
-    seize("halfnurse", function() {
-      if (runif(1)<0.5) 2 else 1 ## 50% chance of starting at level 3 or 2
-    }) %>% 
-    renege_abort() %>% 
-    join(common_patient)
-  
-  
-  ## Initial trajectory for elective patients
-  ## Appear at timepoint 0.1 so they have less priority
-  ## If no space, they reappear a week later
-  
-  elective_delay<-trajectory() %>% 
-    set_global("Cancelled Elective Surgery",1,mod="+") %>% 
-    timeout(6.5) %>% # 7 days minus the 0.5 before renege
-    rollback(3) # to renege_in in elective_patient
-  
-  elective_patient<-trajectory() %>% 
-    #log_("Elective Patient") %>% 
-    set_attribute("type",2) %>% 
-    timeout(0.1) %>%
-    renege_in(0.5,elective_delay) %>% 
-    seize("bed") %>% 
-    seize("halfnurse", function() {
-      if (runif(1)<0.5) 2 else 1 ## 50% chance of starting at level 3 or 2
-    }) %>% 
-    renege_abort() %>% 
-    join(common_patient)
-  
-
-  
-  
-  
   ## Display the trajectory for sense-checking (remove before running this multiple times!)  
-  #print(plot(elective_patient))
+  #print(plot(patient))
   
   
-  ## Set up the simulation. 2 Admission types (for now), 2 resources
+  
+  ## Set up the simulation. 2 Admission types (for now - using single trajectory), 2 resources
   ## bed - represents a physical bed (we have 16)
   ## halfnurse - represents half of a nurse (we have 12 nurses)
   ## halfnurse used because level 2 and below patients can have a 1:2 nursing ratio
@@ -104,14 +70,12 @@ simmer_wrapper <- function(i) {
   ## rounded so we can use part-days for priority
   
   env %>% 
-    add_generator("Emergency Patient",emergency_patient,from_to(sim_start_num,sim_end_num,function() round(rexp(1,1/1)))) %>%  ## Type 1
-    add_generator("Elective Patient",elective_patient,from_to(sim_start_num,sim_end_num,function() round(rexp(1,1/3)))) %>%    ## Type 2
+    add_generator("Emergency Patient",patient,from_to(sim_start_num,sim_end_num,function() round(rexp(1,1/1)))) %>%  ## Type 1
+    add_generator("Elective Patient",patient,from_to(sim_start_num,sim_end_num,function() round(rexp(1,1/3)))) %>%   ## Type 2
     add_resource("bed",16) %>% 
     add_resource("halfnurse",24) %>% 
     run() %>% 
     wrap()
-
-
   
 }
 
