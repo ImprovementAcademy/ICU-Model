@@ -131,4 +131,6 @@ patients$Admission.Date<-as.Date(patients$Admission.Date,format="%d/%m/%Y")
 
 ![Health Foundation Logo](https://www.health.org.uk/themes/custom/health_foundation/assets/images/logo.png)
 
-The Winter Pressures Modelling Project is part of the Health Foundation’s Applied Analytics programme. The Health Foundation is an independent charity committed to bringing about better health and health care for people in the UK. 
+The Winter Pressures Modelling Project is part of the Health Foundation’s Applied Analytics programme. The Health Foundation is an independent charity committed to bringing about better health and health care for people in the UK.
+
+Massive thanks to Iñaki Ucar, creator of r-simmer, for his support of the work - both in terms of advice and modifications to r-simmer to make it more suitable for this type of work.
