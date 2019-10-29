@@ -22,7 +22,7 @@ Reasonable familiarity with R as a programming language, including use of [pipe 
 
 Familiarisation with [r-simmer](https://r-simmer.org/)
 
-Vignettes are in [r-simmer vignettes/](r-simmer vignettes/)
+Vignettes are in [r-simmer vignettes/](r-simmer%20vignettes/)
 
 Take a look at [The Bank Tutorial: Part I](https://r-simmer.org/articles/simmer-04-bank-1.html).
 
@@ -46,7 +46,7 @@ Some suggestions for a sensible model:
 * Patient stay: `timeout(function() {round(runif(1,0,30))})`
 * Suggest putting the model environment into a wrapper for later Monte-Carlo use
 
-**Solution:** [1 - Partmodel-BedsOnly.R](1 - Partmodel-BedsOnly.R)
+**Solution:** [1 - Partmodel-BedsOnly.R](1%20-%20Partmodel-BedsOnly.R)
 
 ### Step 2
 
@@ -59,7 +59,7 @@ Some suggestions:
 * At initial level - `timeout(function() {round(runif(1,0,15))})`
 * At lower level (after releasing half a nurse if L3) - `timeout(function() {round(runif(1,0,15))})`
 
-**Solution:** [2 - Partmodel-AddedNurses.R](2 - Partmodel-AddedNurses.R)
+**Solution:** [2 - Partmodel-AddedNurses.R](2%20-%20Partmodel-AddedNurses.R)
 
 ### Step 3
 
@@ -71,7 +71,7 @@ Some suggestions:
 * Elective: `timeout(0.1)` to make emergency patients take priority
 * Use `rollback()` to allow elective patients to return
 
-**Solution:** [3 - Partmodel-ElectiveAndEmergency.R](3 - Partmodel-ElectiveAndEmergency.R)
+**Solution:** [3 - Partmodel-ElectiveAndEmergency.R](3%20-%20Partmodel-ElectiveAndEmergency.R)
 
 ### Step 4
 
@@ -85,7 +85,7 @@ Some suggestions:
 * (Optional) - correct stays using an offset, for the way ICNARC days are calculated (eg 8pm-8am counts as 2 days)
 * Some sensible values: L3 - `rpois(1,5)`, L2 - `rpois(1,5)`, L1 - `rpois(1,3)`, L0 - `rpois(1,1)`
 
-**Solution:** [4 - Partmodel-DaysAsAttributes.R](4 - Partmodel-DaysAsAttributes.R)
+**Solution:** [4 - Partmodel-DaysAsAttributes.R](4%20-%20Partmodel-DaysAsAttributes.R)
 
 ### Step 5
 
@@ -97,11 +97,11 @@ Some suggestions:
 * Return inter-arrival time gaps (which may be zero), and -1 to finish
 * Some sensible values: `rpois(1,mean)` where mean is 0.7 for emergency and 0.3 for elective
 
-**Solution:** [5 - Partmodel-PoissonGenerator.R](5 - Partmodel-PoissonGenerator.R)
+**Solution:** [5 - Partmodel-PoissonGenerator.R](5%20-%20Partmodel-PoissonGenerator.R)
 
 ### Step 6
 
-Drive the model with real data from [ICNARC Test Data.csv](ICNARC Test Data.csv)
+Drive the model with real data from [ICNARC Test Data.csv](ICNARC%20Test%20Data.csv)
 
 Some suggestions:
 
@@ -115,7 +115,7 @@ patients$Admission.Date<-as.Date(patients$Admission.Date,format="%d/%m/%Y")
 * In patient days generator trajectory, select a real patient of the appropriate type (use `set_attribute` and `get_attribute` to store patient types)
 * Use `mclapply` to run a Monte-Carlo simulation (environment needs to be in a wrapper if it isn't already)
 
-**Solution:** [6 - Partmodel-DataDriven.R](6 - Partmodel-DataDriven.R)
+**Solution:** [6 - Partmodel-DataDriven.R](6%20-%20Partmodel-DataDriven.R)
 
 ### Extra credit
 
