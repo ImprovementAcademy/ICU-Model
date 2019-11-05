@@ -3,7 +3,10 @@
 
 Written for the NHS-R Conference 2019
 
-Based on [http://futurehospital.rcpjournal.org/content/6/1/17.abstract]
+Based on:
+
+>Lawton T, McCooe M. POLICY: A novel modelling technique to predict resource -requirements in critical care - a case study. Future Healthc J. 2019;6(1):17–20. doi:10.7861/futurehosp.6-1-17
+ [http://futurehospital.rcpjournal.org/content/6/1/17.abstract] / [https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6520084/]
 
 Produced as a teaching package to expand use of the technique being used in the Health Foundation's [Winter Pressures Modelling Project](https://www.health.org.uk/improvement-projects/use-of-novel-modelling-techniques-and-routinely-collected-data-to-explore-responses-to)
 
