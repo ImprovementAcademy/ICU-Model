@@ -21,9 +21,6 @@ library("ggplot2")
 library("lubridate",include.only="round_date") ## Not sure what lubridate is up to but it breaks the sim if the whole thing is included
 
 
-this.dir <-dirname(parent.frame(2)$ofile)
-setwd(this.dir)
-
 ## All needs wrapping so that we can run multiple replications (Monte Carlo)
 
 simmer_wrapper <- function(i) {

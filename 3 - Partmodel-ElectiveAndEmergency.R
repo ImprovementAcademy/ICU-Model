@@ -20,9 +20,6 @@ library("lubridate",include.only="round_date") ## Not sure what lubridate is up 
 
 
 
-this.dir <-dirname(parent.frame(2)$ofile)
-setwd(this.dir)
-
 ## All needs wrapping so that we can run multiple replications (Monte Carlo)
 
 simmer_wrapper <- function(i) {

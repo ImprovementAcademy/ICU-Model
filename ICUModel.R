@@ -12,10 +12,6 @@ library("lubridate",include.only="round_date") ## Not sure what lubridate is up 
 
 
 
-this.dir <-dirname(parent.frame(2)$ofile)
-setwd(this.dir)
-
-
 ## Read in patient data
 
 patients<-read.csv("ICNARC Test Data.csv",header=TRUE,sep=",",colClasses=c("Admission.Date"="character"))
