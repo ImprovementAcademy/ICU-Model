@@ -37,6 +37,8 @@ Look at "Balking and reneging customers" from [The Bank Tutorial: Part II](https
 
 Important concepts: `renege_in`,`renege_abort`
 
+The important sections of these two vignettes have been copied into [0 - Bank model sections.Rmd](0%20-%20Bank%20model%20sections.Rmd) which may be easier to go through.
+
 Keep the [r-simmer reference](https://r-simmer.org/reference/) open during subsequent steps.
 
 ### Step 1
